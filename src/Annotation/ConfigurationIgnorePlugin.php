@@ -2,8 +2,6 @@
 
 namespace Drupal\config_ignore_keys\Annotation;
 
-use Doctrine\Common\Annotations\Annotation\Attribute;
-use Doctrine\Common\Annotations\Annotation\Attributes;
 use Drupal\Component\Annotation\Plugin;
 
 /**
