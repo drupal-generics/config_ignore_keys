@@ -146,7 +146,7 @@ class ConfigImportEventSubscriber implements EventSubscriberInterface {
    * @param string $configKey
    *   The configuration key which needs to be ignored.
    */
-  private function saveStateWithConfig(string $configFile, string $configKey) {
+  private function saveStateWithConfig($configFile, $configKey) {
     $config = $this->configFactory->getEditable($configFile);
     foreach ($this->languageManager->getLanguages() as $language) {
       $config_translation = $this->languageConfigFactoryOverride->getOverride($language->getId(), $configFile);
@@ -171,7 +171,7 @@ class ConfigImportEventSubscriber implements EventSubscriberInterface {
    * @param string $configKey
    *   The configuration key which needs to be ignored.
    */
-  private function saveConfigFromState(string $configFile, string $configKey) {
+  private function saveConfigFromState($configFile, $configKey) {
     foreach ($this->languageManager->getLanguages() as $language) {
       if ($stateValue = $this->state->get($language->getId() . $configFile . $configKey)) {
         $config_translation = $this->languageConfigFactoryOverride->getOverride($language->getId(), $configFile);
@@ -196,7 +196,7 @@ class ConfigImportEventSubscriber implements EventSubscriberInterface {
    * @param string $configKey
    *   The configuration key which needs to be ignored.
    */
-  private function saveConfigFileFromState(string $configFile, string $configKey) {
+  private function saveConfigFileFromState($configFile, $configKey) {
     foreach ($this->languageManager->getLanguages() as $language) {
       if ($stateValue = $this->state->get($language->getId() . $configFile . $configKey)) {
         $config_translation = $this->languageConfigFactoryOverride->getOverride($language->getId(), $configFile);
