@@ -2,7 +2,6 @@
 
 namespace Drupal\config_ignore_keys\Plugin\ConfigIgnore;
 
-use Drupal\config_ignore_keys\Annotation\ConfigurationIgnorePlugin;
 use Drupal\Core\Plugin\PluginBase;
 use Drupal\config_ignore_keys\Plugin\ConfigurationIgnorePluginInterface;
 
