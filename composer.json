@@ -1,0 +1,6 @@
+{
+    "name": "drupal-generics/config_ignore_keys",
+    "description": "Allows the developer to ignore particular keys in the configuration",
+    "require": {
+    }
+}
