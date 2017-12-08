@@ -15,6 +15,11 @@ use Drupal\node\Entity\NodeType;
  */
 class ConfigIgnoreTest extends KernelTestBase {
 
+  /**
+   * The modules that will be enabled during testing.
+   *
+   * @var array
+   */
   public static $modules = [
     'system',
     'field',
@@ -79,39 +84,34 @@ class ConfigIgnoreTest extends KernelTestBase {
 
     // Import.
     $this->configImporter->reset()->import();
-  }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function testConfigIgnore() {
-    $original_content_type_name = 'Test node type';
-    /* @var $node_config_ignore_plugin \Drupal\configuration_ignore_test\Plugin\ConfigIgnore\NodeConfigIgnore */
+    // Create a new content type.
     $content_type = NodeType::create([
       'type' => static::NODE_TYPE_NAME,
-      'name' => $original_content_type_name,
+      'name' => 'Test node type',
     ]);
     $content_type->save();
+    // Add a body field.
     node_add_body_field($content_type);
 
     // Copy the current config over the sync config set.
-    /** @var \Drupal\Core\Config\StorageInterface $active */
     $active = $this->container->get('config.storage');
     $this->copyConfig($active, $this->sync);
     $this->configImporter->reset()->import();
+  }
 
-    // Change the content type name.
+  /**
+   * Verifies that items are ignored correctly.
+   */
+  public function testConfigIgnored() {
     $content_type = NodeType::load(static::NODE_TYPE_NAME);
+    // Change the content type name.
     $content_type->set('name', 'New node type name');
     $content_type->save();
-    // Change the body field name. This should not be ignored by the import.
-    $field = FieldConfig::loadByName('node', $content_type->id(), 'body');
-    $field->set('label', 'New label');
-    $field->save();
 
     $this->configImporter->reset();
     $updates = $this->configImporter->getUnprocessedConfiguration('update');
-    self::assertEquals(2, count($updates), 'There are 2 configuration items to update.');
+    self::assertEquals(1, count($updates), 'There is 1 configuration item to update.');
 
     // Import the configuration containing the old content type node.
     $this->configImporter->reset()->import();
@@ -119,7 +119,26 @@ class ConfigIgnoreTest extends KernelTestBase {
     // Load the content type after import.
     $content_type = NodeType::load(static::NODE_TYPE_NAME);
     // Check that the content type name change was not imported.
-    self::assertNotEquals($content_type->get('name'), $original_content_type_name);
+    self::assertNotEquals($content_type->get('name'), 'Test node type');
+  }
+
+  /**
+   * Verifies items import correctly.
+   */
+  public function testConfigNotIgnored() {
+    $content_type = NodeType::load(static::NODE_TYPE_NAME);
+    // Change the body field name. This should not be ignored by the import.
+    $field = FieldConfig::loadByName('node', $content_type->id(), 'body');
+    $field->set('label', 'New label');
+    $field->save();
+
+    $this->configImporter->reset();
+    $updates = $this->configImporter->getUnprocessedConfiguration('update');
+    self::assertEquals(1, count($updates), 'There is 1 configuration item to update.');
+
+    // Import the configuration containing the old content type node.
+    $this->configImporter->reset()->import();
+
     // Check that the body field label was changed, as it should not be ignored.
     $field = FieldConfig::loadByName('node', $content_type->id(), 'body');
     self::assertEquals($field->get('label'), 'Body');
